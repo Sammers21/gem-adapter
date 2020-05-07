@@ -23,15 +23,17 @@
  */
 package com.artipie.gem;
 
-import com.artipie.asto.memory.InMemoryStorage;
+import com.artipie.asto.fs.FileStorage;
 import com.artipie.vertx.VertxSliceServer;
 import com.jcabi.log.Logger;
 import io.vertx.reactivex.core.Vertx;
 import java.io.IOException;
+import java.nio.file.Path;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
+import org.junit.jupiter.api.io.TempDir;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.GenericContainer;
@@ -47,11 +49,12 @@ import org.testcontainers.containers.GenericContainer;
 public class GemCliITCase {
 
     @Test
-    public void gemPushAndInstallWorks() throws IOException, InterruptedException {
+    public void gemPushAndInstallWorks(@TempDir final Path temp)
+        throws IOException, InterruptedException {
         final Vertx vertx = Vertx.vertx();
         final VertxSliceServer server = new VertxSliceServer(
             vertx,
-            new GemSlice(new InMemoryStorage(), vertx.fileSystem())
+            new GemSlice(new FileStorage(temp, vertx.fileSystem()), vertx.fileSystem())
         );
         final int port = server.start();
         final String host = String.format("http://host.testcontainers.internal:%d", port);
