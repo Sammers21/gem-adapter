@@ -62,10 +62,18 @@ public class GemCliITCase {
             .withFileSystemBind("./src/test/resources", "/home");
         ruby.start();
         MatcherAssert.assertThat(
-            String.format("'gem push failed with non-zero code", host),
+            String.format("'gem push builder-3.2.4.gem failed with non-zero code", host),
             this.bash(
                 ruby,
                 String.format("GEM_HOST_API_KEY=123 gem push builder-3.2.4.gem --host %s", host)
+            ),
+            Matchers.equalTo(0)
+        );
+        MatcherAssert.assertThat(
+            String.format("'gem push rails-6.0.2.2.gem failed with non-zero code", host),
+            this.bash(
+                ruby,
+                String.format("GEM_HOST_API_KEY=123 gem push rails-6.0.2.2.gem --host %s", host)
             ),
             Matchers.equalTo(0)
         );

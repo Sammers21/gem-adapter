@@ -22,9 +22,12 @@ class SubmitGem
     @fs = fs
     @idx = "temp-gem-index"
     @gems = File.join(@idx, "gems")
-    Dir.mkdir(@idx) unless File.exists?(@idx)
+    # Was index created before?
+    idx_existed = File.exists?(@idx)
+    Dir.mkdir(@idx) unless idx_existed
     Dir.mkdir(@gems) unless File.exists?(@gems)
     @indexer = Gem::Indexer.new(@idx, { build_modern: true })
+    @indexer.generate_index unless idx_existed
   end
 
   def response(line, headers, body)
@@ -36,7 +39,7 @@ class SubmitGem
               # @todo #9:30min Sync generated indexes with Storage.
               #  For now, generated indexes are stored locally in temp-gem-index directory.
               #  Those should also be syncronized with storage.
-              @indexer.generate_index
+              @indexer.update_index
               RsWithStatus.new(RsStatus::OK)
             }
         )
